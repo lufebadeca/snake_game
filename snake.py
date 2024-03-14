@@ -84,7 +84,8 @@ class PiSerpiente:
                 if self.serpiente[0] in self.serpiente[1:]:
                     curses.endwin()
                     self.mostrar_puntuacion(self.puntuacion)
-                    break       #103
+                    break       #103 
+                #my first commit to remote
         
         
     
