@@ -20,6 +20,13 @@ class PiSerpiente:
         self.cerrar = (ord('c'),ord('C'))
         
         curses.curs_set(0)              #disables cursor flickering
+
+    def mostrar_puntuacion(self, puntuacion):
+        self.pantalla.clear()
+        fin = 'Su puntuación: {s} puntos(s)'.format(s=puntuacion)
+        self.pantalla.addstr(self.pantalla_altura // 2, self.pantalla_anchura // 2 - len(fin) // 2, fin)
+        self.pantalla.refresh()
+        self.pantalla.getch()
         
     def pintar_ventana(self):
         self.pantalla_altura, self.pantalla_anchura = self.pantalla.getmaxyx()
@@ -45,7 +52,7 @@ class PiSerpiente:
         while True:                         #while loop to control the flow of the game
             if curses.has_colors():
                 self.ventana_serpiente.attrset(curses.color_pair(3))
-            bandera = '[ {t} - Puntuación:]'.format(t=self.__class__.__name__, s=self.puntuacion)
+            bandera = '[ {t} - Puntuación:{s} ]'.format(t=self.__class__.__name__, s=self.puntuacion)
             self.ventana_serpiente.addstr(0, 2, bandera)
             
             self.ventana_serpiente.timeout(self.velocidad)
@@ -58,13 +65,6 @@ class PiSerpiente:
                 curses.endwin()
                 self.mostrar_puntuacion(self.puntuacion)
                 break
-            
-        def mostrar_puntuacion(self, puntuacion):
-            self.pantalla.clear()
-            fin = 'Su puntuación: {s} puntos(s)'.format(s=puntuacion)
-            self.pantalla.addstr(self.pantalla_altura // 2, self.pantalla_anchura // 2 - len(fin) // 2, fin)
-            self.pantalla.refresh()
-            self.pantalla.getch()
             
             serpiente_x = self.serpiente[0][1]      #temporary head coordinate value. first pair, second value (10)
             serpiente_y = self.serpiente[0][0]      #temporary head coordinate value. first pair, first value (1)
@@ -84,7 +84,7 @@ class PiSerpiente:
             if self.serpiente[0] in self.serpiente[1:]: #if the head touches any part of the body
                 curses.endwin()
                 self.mostrar_puntuacion(self.puntuacion)
-                #break
+                break
             
             if self.serpiente[0] == self.comida:    #if the head touches food
                 self.puntuacion += 1 
@@ -101,7 +101,7 @@ class PiSerpiente:
                     self.comida[1], '*')
                 
             else:       #if the head does not touch food
-                cola = self.serpiente.pop()         #removes cola and saves the coordinate (2 var list)
+                cola = self.serpiente.pop()         #removes tip and saves the coordinate (2 var list)
                 self.ventana_serpiente.addch(cola[0], cola[1], ' ')     #adds blank into the previous coordinates of cola
             
             if curses.has_colors(): 
