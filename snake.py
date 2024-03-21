@@ -114,7 +114,7 @@ class PiSerpiente:
             for cuerpo in self.serpiente[1:]:
                 self.ventana_serpiente.addch(cuerpo[0], cuerpo[1], self.cuerpo)
                 
-curses.wrapp(PiSerpiente)
+curses.wrapper(PiSerpiente)
         
         
     
