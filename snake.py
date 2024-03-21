@@ -7,8 +7,8 @@ class PiSerpiente:
     def __init__(self, screen):
         self.pantalla = screen
 
-        self.serpiente = [[1,10],[1,9],[1,8],[1,7]]
-        self.comida = [5,20]
+        self.serpiente = [[1,10],[1,9],[1,8],[1,7]]     #2D list for snake body
+        self.comida = [5,20]                            #first food location
         
         self.puntuacion = 0
         self.cabeza= 'Ö'
@@ -19,7 +19,14 @@ class PiSerpiente:
         self.tecla = KEY_RIGHT
         self.cerrar = (ord('c'),ord('C'))
         
-        curses.curs_set(0) #disables pointer flickering
+        curses.curs_set(0)              #disables cursor flickering
+
+    def mostrar_puntuacion(self, puntuacion):
+        self.pantalla.clear()
+        fin = 'Su puntuación: {s} puntos(s)'.format(s=puntuacion)
+        self.pantalla.addstr(self.pantalla_altura // 2, self.pantalla_anchura // 2 - len(fin) // 2, fin)
+        self.pantalla.refresh()
+        self.pantalla.getch()
         
     def pintar_ventana(self):
         self.pantalla_altura, self.pantalla_anchura = self.pantalla.getmaxyx()
@@ -42,10 +49,10 @@ class PiSerpiente:
             self.ventana_serpiente.attrset(curses.color_pair(1))
         self.ventana_serpiente.addch(self.comida[0], self.comida[1], '*')
         
-        while True:
+        while True:                         #while loop to control the flow of the game
             if curses.has_colors():
                 self.ventana_serpiente.attrset(curses.color_pair(3))
-            bandera = '[ {t} - Puntuación:]'.format(t=self.__class__.__name__, s=self.puntuacion)
+            bandera = '[ {t} - Puntuación:{s} ]'.format(t=self.__class__.__name__, s=self.puntuacion)
             self.ventana_serpiente.addstr(0, 2, bandera)
             
             self.ventana_serpiente.timeout(self.velocidad)
@@ -59,33 +66,55 @@ class PiSerpiente:
                 self.mostrar_puntuacion(self.puntuacion)
                 break
             
-            def mostrar_puntuacion(self, puntuacion):
-                self.pantalla.clear()
-                fin = 'Su puntuación: {s} puntos(s)'.format(s=puntuacion)
-                self.pantalla.addstr(self.pantalla_altura // 2, self.pantalla_anchura // 2 - len(fin) // 2, fin)
-                self.pantalla.refresh()
-                self.pantalla.getch()
+            serpiente_x = self.serpiente[0][1]      #temporary head coordinate value. first pair, second value (10)
+            serpiente_y = self.serpiente[0][0]      #temporary head coordinate value. first pair, first value (1)
+            if self.tecla == KEY_RIGHT: serpiente_x +=1
+            if self.tecla == KEY_DOWN: serpiente_y +=1
+            if self.tecla == KEY_LEFT: serpiente_x -=1
+            if self.tecla == KEY_UP: serpiente_y -=1
+            self.serpiente.insert(0, [serpiente_y, serpiente_x])    #head changes direction, updates the snake coordinates
+            
+            serpiente_x = self.serpiente[0][1]
+            serpiente_y = self.serpiente[0][0]
+            if serpiente_y == 0: self.serpiente[0][0] = self.ventana_juego_altura - 2
+            if serpiente_y == self.ventana_juego_altura - 1: self.serpiente[0][0]= 1
+            if serpiente_x == 0: self.serpiente[0][1] = self.ventana_juego_anchura - 2
+            if serpiente_x == self.ventana_juego_anchura - 1: self.serpiente[0][1]= 1
+            
+            if self.serpiente[0] in self.serpiente[1:]: #if the head touches any part of the body
+                curses.endwin()
+                self.mostrar_puntuacion(self.puntuacion)
+                break
+            
+            if self.serpiente[0] == self.comida:    #if the head touches food
+                self.puntuacion += 1 
+                self.velocidad -= 2
+
+                while True:                 #tries to generate food coordinates
+                    self.comida = [ randint(1, self.ventana_juego_altura - 2), randint(1, self.ventana_juego_anchura - 2) ]
+                    if self.comida not in self.serpiente: 
+                        break               #if ffod coordinates are OK (don't colide), breaks the loop
                 
-                serpiente_x = self.serpiente[0][1]
-                serpiente_y = self.serpiente[0][0]
-                if self.tecla == KEY_RIGHT: serpiente_x +=1
-                if self.tecla == KEY_DOWN: serpiente_y +=1
-                if self.tecla == KEY_LEFT: serpiente_x -=1
-                if self.tecla == KEY_UP: serpiente_y -=1
-                self.serpiente.insert(0, [serpiente_y, serpiente_x])
+                if curses.has_colors():  
+                    self.ventana_serpiente.attrset(curses.color_pair(1)) 
+                    self.ventana_serpiente.addch(self.comida[0], 
+                    self.comida[1], '*')
                 
-                serpiente_x = self.serpiente[0][1]
-                serpiente_y = self.serpiente[0][0]
-                if serpiente_y == 0: self.serpiente[0][0] = self.ventana_juego_altura - 2
-                if serpiente_y == self.ventana_juego_altura - 1: self.serpiente[0][0]= 1
-                if serpiente_x == 0: self.serpiente[0][1] = self.ventana_juego_anchura - 2
-                if serpiente_x == self.ventana_juego_anchura - 1: self.serpiente[0][1]= 1
-                
-                if self.serpiente[0] in self.serpiente[1:]:
-                    curses.endwin()
-                    self.mostrar_puntuacion(self.puntuacion)
-                    break       #103 
-                #my first commit to remote
+            else:       #if the head does not touch food
+                cola = self.serpiente.pop()         #removes tip and saves the coordinate (2 var list)
+                self.ventana_serpiente.addch(cola[0], cola[1], ' ')     #adds blank into the previous coordinates of cola
+            
+            if curses.has_colors(): 
+                self.ventana_serpiente.attrset(curses.color_pair(2)) 
+                self.ventana_serpiente.addch(self.serpiente[0][0], 
+                self.serpiente[0][1], self.cabeza)
+            
+            if curses.has_colors(): 
+                self.ventana_serpiente.attrset(curses.color_pair(4)) 
+            for cuerpo in self.serpiente[1:]:
+                self.ventana_serpiente.addch(cuerpo[0], cuerpo[1], self.cuerpo)
+
+curses.wrapper(PiSerpiente)
         
         
     
