@@ -113,6 +113,8 @@ class PiSerpiente:
                 self.ventana_serpiente.attrset(curses.color_pair(4)) 
             for cuerpo in self.serpiente[1:]:
                 self.ventana_serpiente.addch(cuerpo[0], cuerpo[1], self.cuerpo)
+                
+curses.wrapp(PiSerpiente)
         
         
     
