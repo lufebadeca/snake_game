@@ -36,7 +36,7 @@ class PiSerpiente:
         self.ventana_serpiente = curses.newwin(self.ventana_juego_altura, self.ventana_juego_anchura, self.pantalla_altura // 2 - self.ventana_juego_altura // 2, self.pantalla_anchura // 2 - self.ventana_juego_anchura // 2  )
         
         self.ventana_serpiente.box()
-        self.ventana_serpiente.border('|', '|', '|', '-', '-', '+', '+', '+', '+')
+        self.ventana_serpiente.border('|', '|', '-', '-', '+', '+', '+', '+')
         self.pantalla.refresh()
         
         if curses.has_colors():
