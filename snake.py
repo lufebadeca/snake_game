@@ -15,8 +15,9 @@ class PiSerpiente:
         self.cuerpo = 'o'
         self.velocidad = 100
         
-        self.direcciones = (KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN)
-        self.tecla = KEY_RIGHT
+        self.direcciones =  ( ord('a'), ord('w'), ord('s'), ord('d') )
+        #(KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN)
+        self.tecla = ord('d')
         self.cerrar = ( ord('c'), ord('C') )
         
         curses.curs_set(0)              #disables cursor flickering
@@ -62,9 +63,11 @@ class PiSerpiente:
             self.ventana_serpiente.timeout(self.velocidad)
             
             tecla = self.ventana_serpiente.getch()
-            if tecla in self.direcciones + self.cerrar:
-                self.tecla = tecla
-                print("tecla in direcciones + cerrar")
+            if tecla in self.direcciones + self.cerrar and tecla != self.tecla:
+                if tecla == ord('w') and self.tecla!=ord('s'): self.tecla = tecla
+                if tecla == ord('s') and self.tecla!=ord('w'): self.tecla = tecla
+                if tecla == ord('a') and self.tecla!=ord('d'): self.tecla = tecla
+                if tecla == ord('d') and self.tecla!=ord('a'): self.tecla = tecla
             
             if self.tecla in self.cerrar:
                 curses.endwin()
@@ -73,10 +76,10 @@ class PiSerpiente:
             
             serpiente_x = self.serpiente[0][1]      #temporary head coordinate value. first pair, second value (10)
             serpiente_y = self.serpiente[0][0]      #temporary head coordinate value. first pair, first value (1)
-            if self.tecla == KEY_RIGHT: serpiente_x +=1
-            if self.tecla == KEY_DOWN: serpiente_y +=1
-            if self.tecla == KEY_LEFT: serpiente_x -=1
-            if self.tecla == KEY_UP: serpiente_y -=1
+            if self.tecla == ord('d'): serpiente_x +=1
+            if self.tecla == ord('s'): serpiente_y +=1
+            if self.tecla == ord('a'): serpiente_x -=1
+            if self.tecla == ord('w'): serpiente_y -=1
             self.serpiente.insert(0, [serpiente_y, serpiente_x])    #head changes direction, updates the snake coordinates
             
             serpiente_x = self.serpiente[0][1]
