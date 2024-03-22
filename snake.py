@@ -7,7 +7,7 @@ class PiSerpiente:
     def __init__(self, screen):
         self.pantalla = screen
 
-        self.serpiente = [[1,10],[1,9],[1,8],[1,7]]     #2D list for snake body
+        self.serpiente = [[10,10],[10,9],[10,8],[10,7]]     #2D list for snake body
         self.comida = [5,20]                            #first food location
         
         self.puntuacion = 0
@@ -17,13 +17,17 @@ class PiSerpiente:
         
         self.direcciones = (KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN)
         self.tecla = KEY_RIGHT
-        self.cerrar = (ord('c'),ord('C'))
+        self.cerrar = ( ord('c'), ord('C') )
         
         curses.curs_set(0)              #disables cursor flickering
+        self.pintar_ventana()
 
-    def mostrar_puntuacion(self, puntuacion):
+    def mostrar_puntuacion(self, puntuacion, closed):
         self.pantalla.clear()
-        fin = 'Su puntuación: {s} puntos(s)'.format(s=puntuacion)
+        if closed:
+            fin = 'Usted cerró el juego. Su puntuación: {s} puntos(s)'.format(s=puntuacion)
+        else:
+            fin = 'Perdió. Su puntuación: {s} puntos(s)'.format(s=puntuacion)
         self.pantalla.addstr(self.pantalla_altura // 2, self.pantalla_anchura // 2 - len(fin) // 2, fin)
         self.pantalla.refresh()
         self.pantalla.getch()
@@ -60,10 +64,11 @@ class PiSerpiente:
             tecla = self.ventana_serpiente.getch()
             if tecla in self.direcciones + self.cerrar:
                 self.tecla = tecla
+                print("tecla in direcciones + cerrar")
             
             if self.tecla in self.cerrar:
                 curses.endwin()
-                self.mostrar_puntuacion(self.puntuacion)
+                self.mostrar_puntuacion(self.puntuacion, True)
                 break
             
             serpiente_x = self.serpiente[0][1]      #temporary head coordinate value. first pair, second value (10)
@@ -83,7 +88,7 @@ class PiSerpiente:
             
             if self.serpiente[0] in self.serpiente[1:]: #if the head touches any part of the body
                 curses.endwin()
-                self.mostrar_puntuacion(self.puntuacion)
+                self.mostrar_puntuacion(self.puntuacion, False)
                 break
             
             if self.serpiente[0] == self.comida:    #if the head touches food
@@ -106,8 +111,7 @@ class PiSerpiente:
             
             if curses.has_colors(): 
                 self.ventana_serpiente.attrset(curses.color_pair(2)) 
-                self.ventana_serpiente.addch(self.serpiente[0][0], 
-                self.serpiente[0][1], self.cabeza)
+            self.ventana_serpiente.addch(self.serpiente[0][0],self.serpiente[0][1], self.cabeza)
             
             if curses.has_colors(): 
                 self.ventana_serpiente.attrset(curses.color_pair(4)) 
