@@ -52,7 +52,7 @@ class PiSerpiente:
         
         if curses.has_colors():
             self.ventana_serpiente.attrset(curses.color_pair(1))
-        self.ventana_serpiente.addch(self.comida[0], self.comida[1], '*')
+        self.ventana_serpiente.addch(self.comida[0], self.comida[1], '✱')
         
         while True:                         #while loop to control the flow of the game
             if curses.has_colors():
@@ -62,12 +62,13 @@ class PiSerpiente:
             
             self.ventana_serpiente.timeout(self.velocidad)
             
-            tecla = self.ventana_serpiente.getch()
-            if tecla in self.direcciones + self.cerrar and tecla != self.tecla:
-                if tecla == ord('w') and self.tecla!=ord('s'): self.tecla = tecla
-                if tecla == ord('s') and self.tecla!=ord('w'): self.tecla = tecla
-                if tecla == ord('a') and self.tecla!=ord('d'): self.tecla = tecla
-                if tecla == ord('d') and self.tecla!=ord('a'): self.tecla = tecla
+            teclaActual = self.ventana_serpiente.getch()
+            if teclaActual in self.direcciones + self.cerrar:
+                if teclaActual == ord('w') and self.tecla!=ord('s'): self.tecla = teclaActual
+                if teclaActual == ord('s') and self.tecla!=ord('w'): self.tecla = teclaActual
+                if teclaActual == ord('a') and self.tecla!=ord('d'): self.tecla = teclaActual
+                if teclaActual == ord('d') and self.tecla!=ord('a'): self.tecla = teclaActual
+                if teclaActual in self.cerrar: self.tecla = teclaActual
             
             if self.tecla in self.cerrar:
                 curses.endwin()
@@ -101,12 +102,11 @@ class PiSerpiente:
                 while True:                 #tries to generate food coordinates
                     self.comida = [ randint(1, self.ventana_juego_altura - 2), randint(1, self.ventana_juego_anchura - 2) ]
                     if self.comida not in self.serpiente: 
-                        break               #if ffod coordinates are OK (don't colide), breaks the loop
+                        break               #if food coordinates are OK (don't colide), breaks the loop
                 
                 if curses.has_colors():  
                     self.ventana_serpiente.attrset(curses.color_pair(1)) 
-                    self.ventana_serpiente.addch(self.comida[0], 
-                    self.comida[1], '*')
+                self.ventana_serpiente.addch(self.comida[0], self.comida[1], '✱')
                 
             else:       #if the head does not touch food
                 cola = self.serpiente.pop()         #removes tip and saves the coordinate (2 var list)
